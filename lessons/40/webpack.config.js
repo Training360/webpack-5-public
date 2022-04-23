@@ -1,0 +1,138 @@
+const { resolve } = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const EslintWebpackPlugin = require('eslint-webpack-plugin')
+const StylelintWebpackPlugin = require('stylelint-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
+const mode = process.env.NODE_ENV || 'production'
+const isDevMode = mode === 'development'
+
+module.exports = {
+  mode,
+  entry: {
+    main: getFullPath('src/main.js')
+  },
+  output: {
+    path: getFullPath('public'),
+    filename: isDevMode ? '[name].bundle.js' : '[name].[contenthash].js',
+    clean: true,
+    assetModuleFilename: '[name].[contenthash][ext]'
+  },
+  devtool: isDevMode ? 'eval-source-map' : 'source-map',
+  devServer: {
+    open: true,
+    port: 5055
+  },
+  watchOptions: {
+    ignored: /node_modules/,
+    aggregateTimeout: 1500
+  },
+  performance: {
+    assetFilter
+  },
+  optimization: {
+    minimize: !isDevMode,
+    minimizer: isDevMode
+      ? []
+      : [
+          new TerserPlugin({
+            terserOptions: {
+              format: {
+                comments: false
+              }
+            },
+            extractComments: false
+          }),
+          new CssMinimizerPlugin(),
+          new ImageMinimizerPlugin({
+            minimizer: {
+              implementation: ImageMinimizerPlugin.imageminMinify,
+              options: {
+                plugins: ['svgo', 'optipng', 'gifsicle', 'jpegtran']
+              }
+            }
+          })
+        ]
+  },
+  module: {
+    rules: [
+      {
+        test: /\.m?js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader'
+        }
+      },
+      {
+        test: /\.css$/,
+        use: [
+          isDevMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader'
+        ]
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg|webp)$/i,
+        type: 'asset/resource',
+        exclude: [getFullPath('src/assets/ico')]
+      },
+      {
+        test: /\.(woff(2)|eot|ttf|otf|svg)$/i,
+        type: 'asset/resource',
+        include: [getFullPath('src/assets/fonts')]
+      },
+      {
+        test: /\.svg$/i,
+        type: 'asset/inline'
+      },
+      {
+        test: /\.txt$/i,
+        type: 'asset/source'
+      }
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/assets/template/index.html',
+      minify: false,
+      title: 'Webpack 5',
+      lang: 'hu'
+    }),
+    new EslintWebpackPlugin(),
+    new StylelintWebpackPlugin({
+      files: getFullPath('src/assets/**/*.css')
+    }),
+    ...addProdPlugins([
+      new MiniCssExtractPlugin({
+        filename: 'style.[contenthash].css'
+      }),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: './src/assets/user/**/*',
+            to: getFullPath('public/[name][ext]')
+          }
+        ]
+      }),
+      new BundleAnalyzerPlugin()
+    ])
+  ]
+}
+
+function getFullPath (path) {
+  return path ? resolve(__dirname, path) : resolve(__dirname)
+}
+
+function addProdPlugins (plugins) {
+  return !isDevMode && plugins ? plugins : []
+}
+
+function assetFilter (assetFileName) {
+  const extensionPattern = /\.(png|jpe?g|gif|webp|map)$/i
+  return !extensionPattern.test(assetFileName)
+}

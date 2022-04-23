@@ -1,0 +1,10 @@
+.monsters {
+  &__title {
+    text-align: center;
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}

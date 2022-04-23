@@ -1,0 +1,57 @@
+@import "../mixins/box-shadow";
+
+.monster {
+  background: #fff;
+  border-radius: 0.5em;
+  color: #fff;
+  margin: 0.5em;
+  padding: 1em;
+  width: calc(100% - 1em);
+
+  @include box-shadow(#000);
+
+  @media (min-width: 40em) {
+    width: calc(50% - 1em);
+  }
+
+  @media (min-width: 80em) {
+    width: calc(25% - 1em);
+  }
+
+  &__container {
+    background: #880808;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.5em;
+  }
+
+  &__header {
+    background: #880808;
+    filter: saturate(75%);
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 0.5em;
+    text-align: center;
+
+    @include box-shadow(#fff);
+  }
+
+  &__avatar {
+    filter: sepia(100%) hue-rotate(-50deg);
+    margin: 1em 0 0;
+    max-width: 100%;
+    width: 100%;
+
+    @include box-shadow(#fff);
+  }
+
+  &__footer {
+    align-items: flex-end;
+    display: flex;
+    font-size: 1.5rem;
+    height: 100%;
+    justify-content: space-around;
+    padding: 1rem 0 0;
+  }
+}

@@ -1,0 +1,15 @@
+.monsters {
+  &__title {
+    text-align: center;
+
+    &-logo {
+      height: 1em;
+      padding: 0 0.25em;
+    }
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}

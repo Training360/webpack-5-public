@@ -1,0 +1,28 @@
+@import "./components/monster";
+@import "./components/monsters";
+
+@font-face {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  src: url("../fonts/Roboto-Regular.ttf") format("ttf");
+}
+
+@font-face {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: bold;
+  src: url("../fonts/Roboto-Regular.ttf") format("ttf");
+}
+
+body {
+  background: #eee url("../img/background.jpg");
+  background-size: cover;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
